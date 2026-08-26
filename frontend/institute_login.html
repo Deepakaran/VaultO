@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VaultO &ndash; Institute Exam Centre Portal</title>
+<meta name="description" content="VaultO Institute Exam Centre Portal &ndash; Secure sign-in for registered examination centres.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:        #f0fdf9;
+    --surface:   #ffffff;
+    --teal:      #0d9488;
+    --teal2:     #0f766e;
+    --teal3:     rgba(13,148,136,0.10);
+    --text:      #134e4a;
+    --muted:     #64748b;
+    --border:    rgba(13,148,136,0.20);
+    --red:       #ef4444;
+    --shadow:    0 4px 24px rgba(13,148,136,0.10);
+  }
+
+  html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow: hidden;
+  }
+
+  .page { display: flex; height: 100vh; width: 100vw; }
+
+  /* Left Panel */
+  .left {
+    position: relative;
+    width: 50%;
+    background: linear-gradient(145deg, #0d9488 0%, #115e59 55%, #042f2e 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 52px 60px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  .circle-bg { position: absolute; border-radius: 50%; pointer-events: none; }
+  .cb1 { width: 480px; height: 480px; top: -140px; right: -140px; background: rgba(255,255,255,0.06); }
+  .cb2 { width: 300px; height: 300px; bottom: -100px; left: -80px; background: rgba(255,255,255,0.04); }
+
+  .dot-grid {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px);
+    background-size: 32px 32px;
+    opacity: 0.5;
+  }
+
+  .logo-row {
+    display: flex; align-items: center; gap: 14px;
+    position: relative; z-index: 2;
+  }
+  .shield-icon { width: 46px; height: 50px; flex-shrink: 0; }
+  .logo-name { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 800; letter-spacing: 5px; color: #fff; }
+  .logo-sub { font-size: 9px; letter-spacing: 3px; color: rgba(255,255,255,0.6); margin-top: 2px; text-transform: uppercase; }
+
+  .inst-badge {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 11px; letter-spacing: 2px;
+    color: rgba(255,255,255,0.9);
+    text-transform: uppercase; margin-top: 8px;
+    position: relative; z-index: 2;
+  }
+  .badge-dot { width: 7px; height: 7px; border-radius: 50%; background: #5eead4; box-shadow: 0 0 8px #2dd4bf; }
+
+  .left-mid { position: relative; z-index: 2; }
+  .tagline { font-family: 'Syne', sans-serif; font-size: 40px; font-weight: 800; line-height: 1.1; letter-spacing: -1px; color: #fff; }
+  .tagline em { font-style: normal; color: #99f6e4; }
+  .desc { margin-top: 18px; font-size: 14px; font-weight: 300; line-height: 1.75; color: rgba(255,255,255,0.7); max-width: 360px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 100px; padding: 6px 14px; font-size: 11.5px;
+    color: rgba(255,255,255,0.85);
+  }
+  .chip-dot { width: 5px; height: 5px; border-radius: 50%; background: #2dd4bf; }
+
+  .left-bottom {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 11.5px; color: rgba(255,255,255,0.45);
+    border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;
+  }
+
+  /* Right Panel */
+  .right {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 40px 52px; position: relative; overflow-y: auto; background: var(--bg);
+  }
+
+  .form-wrap { width: 100%; max-width: 400px; position: relative; z-index: 2; }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 12px; font-weight: 500; color: var(--teal);
+    text-decoration: none; margin-bottom: 28px; transition: gap 0.2s;
+  }
+  .back-link:hover { gap: 9px; }
+
+  .form-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); }
+  .form-subtitle { font-size: 13.5px; color: var(--muted); margin-top: 8px; line-height: 1.6; margin-bottom: 26px; }
+
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 7px; }
+  .input-wrap { position: relative; }
+  .input-wrap .ico {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    width: 16px; height: 16px; color: var(--muted); pointer-events: none;
+  }
+  .field input {
+    width: 100%; background: var(--surface);
+    border: 1.5px solid #cbd5e1; border-radius: 10px;
+    padding: 13px 14px 13px 42px; color: var(--text); font-family: 'Inter', sans-serif;
+    font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,0.15); }
+  .field.error input { border-color: var(--red); box-shadow: 0 0 0 3px rgba(239,68,68,0.1); }
+
+  .eye-btn {
+    position: absolute; right: 13px; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; color: var(--muted); padding: 4px;
+    display: flex; align-items: center;
+  }
+
+  .btn-primary {
+    width: 100%; padding: 14px; background: var(--teal); color: #fff;
+    border: none; border-radius: 10px; font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 1px; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    box-shadow: 0 4px 14px rgba(13,148,136,0.3); margin-top: 10px;
+  }
+  .btn-primary:hover { background: var(--teal2); transform: translateY(-1px); }
+
+  .general-error {
+    background: #fef2f2; border: 1px solid rgba(239,68,68,0.3); color: var(--red);
+    padding: 11px 14px; border-radius: 8px; font-size: 12.5px; margin-bottom: 18px; display: none;
+  }
+
+  .step { display: none; }
+  .step.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .security-note {
+    display: flex; align-items: flex-start; gap: 9px;
+    background: var(--surface); border: 1px solid #e2e8f0;
+    border-radius: 10px; padding: 13px 15px; margin-top: 24px;
+  }
+  .security-note p { font-size: 11px; color: var(--muted); line-height: 1.55; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--text); color: #fff; border-radius: 10px; padding: 12px 22px;
+    font-size: 13px; display: flex; align-items: center; gap: 10px; z-index: 9999;
+    transition: transform 0.3s cubic-bezier(0.34,1.4,0.64,1); box-shadow: var(--shadow);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: #dc2626; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Left Panel -->
+  <div class="left">
+    <div class="dot-grid"></div>
+    <div class="circle-bg cb1"></div>
+    <div class="circle-bg cb2"></div>
+
+    <div class="logo-row">
+      <svg class="shield-icon" viewBox="0 0 48 52" fill="none">
+        <path d="M24 2L44 11V28Q44 44 24 50Q4 44 4 28V11Z" fill="rgba(255,255,255,0.15)" stroke="white" stroke-width="2" stroke-linejoin="round"/>
+        <rect x="16.5" y="27" width="15" height="11" rx="2.5" fill="white"/>
+        <path d="M19.5 27V22Q19.5 17 24 17Q28.5 17 28.5 22V27" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="logo-name">VAULTO</div>
+        <div class="logo-sub">Exam Centre Architecture</div>
+      </div>
+      <div class="inst-badge" style="margin-left: auto;">
+        <span class="badge-dot"></span> Institute / Centre
+      </div>
+    </div>
+
+    <div class="left-mid">
+      <h1 class="tagline">Secure Examination <em>Centre</em> Node</h1>
+      <p class="desc">Receive encrypted paper payloads, verify SHA-256 integrity checksums, cache offline, and perform multi-factor controlled decryption with watermarked printing.</p>
+      <div class="chips">
+        <div class="chip"><span class="chip-dot"></span> Offline Local Storage</div>
+        <div class="chip"><span class="chip-dot"></span> SHA-256 Tamper Check</div>
+        <div class="chip"><span class="chip-dot"></span> QR Mobile Handshake</div>
+        <div class="chip"><span class="chip-dot"></span> Watermarked Print Engine</div>
+      </div>
+    </div>
+
+    <div class="left-bottom">
+      <span>VaultO Centre v2.0 &bull; Consumer / Executor</span>
+      <span>CERT-In &bull; Zero-Trust Protocol</span>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="right">
+    <div class="form-wrap">
+      <a href="/" class="back-link">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="10,3 5,8 10,13"/></svg>
+        Choose Portal
+      </a>
+
+      <div class="general-error" id="generalError"></div>
+
+      <!-- STEP 1: Enter Email -->
+      <div class="step active" id="step1">
+        <div class="form-title">Centre Sign In</div>
+        <div class="form-subtitle">Enter your registered examination centre email to request a secure authentication OTP.</div>
+        <div class="field" id="field-email">
+          <label>Centre Official Email</label>
+          <div class="input-wrap">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8l10 6 10-6"/></svg>
+            <input type="email" id="email" placeholder="principal@school.edu" autocomplete="email" autofocus>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-step1" onclick="handleStep1()">REQUEST LOGIN OTP &rarr;</button>
+      </div>
+
+      <!-- STEP 2: Enter OTP -->
+      <div class="step" id="step2">
+        <div class="form-title">Verify OTP</div>
+        <div class="form-subtitle" id="step2Sub">Enter the 6-digit verification code sent to your registered email.</div>
+        <div class="field" id="field-otp">
+          <label>6-Digit OTP</label>
+          <div class="input-wrap">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <input type="text" id="otp" maxlength="6" inputmode="numeric" placeholder="●●●●●●" style="letter-spacing:6px;font-size:18px;font-weight:700;text-align:center;">
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-step2" onclick="handleStep2()">VALIDATE OTP &rarr;</button>
+        <div style="text-align:center;margin-top:14px;">
+          <a href="#" onclick="handleStep1();return false;" style="font-size:12px;color:var(--teal);text-decoration:none;">Resend OTP</a>
+        </div>
+      </div>
+
+      <!-- STEP 3: Enter Centre ID and Password -->
+      <div class="step" id="step3">
+        <div class="form-title">Centre Credentials</div>
+        <div class="form-subtitle">Enter your Centre ID and password to complete workstation connection.</div>
+        <div class="field" id="field-instId">
+          <label>Centre ID (e.g. INS-1001)</label>
+          <div class="input-wrap">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 14V7l5-5 5 5v7"/><path d="M6 14v-4h4v4"/></svg>
+            <input type="text" id="instId" placeholder="INS-1001" autocomplete="username">
+          </div>
+        </div>
+        <div class="field" id="field-password">
+          <label>Centre Password</label>
+          <div class="input-wrap">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="password" placeholder="••••••••••••" autocomplete="current-password">
+            <button type="button" class="eye-btn" onclick="toggleEye('password')">
+              <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+          <a href="/forgot_password.html" style="font-size:12px;color:var(--teal);text-decoration:none;">Forgot password?</a>
+        </div>
+        <button class="btn-primary" id="btn-step3" onclick="handleStep3()">CONNECT EXAM WORKSTATION &rarr;</button>
+      </div>
+
+      <div class="security-note">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" style="flex-shrink:0;margin-top:1px;"><path d="M8 2L13 4.5V9C13 12 10.5 14.5 8 15C5.5 14.5 3 12 3 9V4.5Z"/><polyline points="5.5,8 7,9.5 10.5,6"/></svg>
+        <p>All exam center operations are audited and watermarked. Decryption keys are multi-factor protected.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+  let instEmail = '';
+  let instOtp = '';
+
+  function toggleEye(id) {
+    const input = document.getElementById(id);
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  function showToast(msg, isError = false) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.className = 'toast show' + (isError ? ' error' : '');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('generalError');
+    if (msg) { el.textContent = msg; el.style.display = 'block'; }
+    else { el.style.display = 'none'; }
+  }
+
+  function setStep(stepId) {
+    document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+    document.getElementById(stepId).classList.add('active');
+    showError('');
+  }
+
+  async function handleStep1() {
+    const email = document.getElementById('email').value.trim();
+    if (!email || !email.includes('@')) {
+      showError('Please enter a valid centre email address.');
+      return;
+    }
+    instEmail = email;
+    const btn = document.getElementById('btn-step1');
+    btn.disabled = true; btn.textContent = 'Sending OTP...';
+
+    try {
+      const res = await fetch('/institute/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      const data = await res.json();
+      btn.disabled = false; btn.textContent = 'REQUEST LOGIN OTP →';
+
+      if (res.ok && data.success) {
+        showToast('🔑 Login OTP sent to registered centre email');
+        document.getElementById('step2Sub').textContent = `Enter the 6-digit OTP sent to ${email}`;
+        setStep('step2');
+      } else {
+        showError(data.message || 'Failed to send OTP.');
+      }
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'REQUEST LOGIN OTP →';
+      showError('Network error. Check connection.');
+    }
+  }
+
+  function handleStep2() {
+    const otp = document.getElementById('otp').value.trim();
+    if (otp.length < 6) {
+      showError('Please enter the complete 6-digit OTP.');
+      return;
+    }
+    instOtp = otp;
+    showToast('OTP verified. Finalize centre login.');
+    setStep('step3');
+  }
+
+  async function handleStep3() {
+    const instId = document.getElementById('instId').value.trim();
+    const password = document.getElementById('password').value;
+
+    if (!instId || !password) {
+      showError('Please enter both Centre ID and password.');
+      return;
+    }
+
+    const btn = document.getElementById('btn-step3');
+    btn.disabled = true; btn.textContent = 'Authenticating Workstation...';
+
+    try {
+      const res = await fetch('/institute/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: instEmail,
+          instituteId: instId,
+          password: password,
+          otp: instOtp
+        })
+      });
+      const data = await res.json();
+      btn.disabled = false; btn.textContent = 'CONNECT EXAM WORKSTATION →';
+
+      if (res.ok && data.success) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('instituteUser', JSON.stringify(data.institute));
+        showToast('Workstation authorized! Connecting...');
+        setTimeout(() => { window.location.href = '/institute-app/index.html'; }, 1000);
+      } else {
+        if (data.message && data.message.toLowerCase().includes('otp')) {
+          setStep('step2');
+        }
+        showError(data.message || 'Authentication failed.');
+      }
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'CONNECT EXAM WORKSTATION →';
+      showError('Network error. Check connection.');
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('email').addEventListener('keydown', e => { if (e.key === 'Enter') handleStep1(); });
+    document.getElementById('otp').addEventListener('keydown', e => { if (e.key === 'Enter') handleStep2(); });
+    document.getElementById('instId').addEventListener('keydown', e => { if (e.key === 'Enter') handleStep3(); });
+    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') handleStep3(); });
+  });
+</script>
+</body>
+</html>

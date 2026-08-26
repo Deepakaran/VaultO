@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VaultO &ndash; Secure Exam Delivery Architecture</title>
+<meta name="description" content="VaultO Secure Exam Delivery &ndash; Choose Admin Controller, Institute Centre, or Authority Mobile Authenticator.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg:      #f4f6fb;
+    --surface: #ffffff;
+    --text:    #1a1a2e;
+    --muted:   #6b7280;
+    --shadow:  0 8px 32px rgba(0,0,0,0.08);
+    --shadow-hover: 0 16px 48px rgba(0,0,0,0.13);
+  }
+
+  html, body {
+    min-height: 100vh;
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  .bg-art { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+  .bg-blob {
+    position: absolute; border-radius: 50%; filter: blur(80px);
+    animation: blobPulse var(--bd,10s) ease-in-out var(--bdel,0s) infinite alternate;
+  }
+  @keyframes blobPulse {
+    0%   { transform: scale(1) translate(0,0); }
+    100% { transform: scale(1.08) translate(var(--btx,10px), var(--bty,-15px)); }
+  }
+
+  .dot-pattern {
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(100,100,200,0.08) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .page {
+    position: relative; z-index: 1; min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .header {
+    display: flex; flex-direction: column; align-items: center; margin-bottom: 44px;
+    opacity: 0; animation: fadeUp 0.7s ease 0.1s forwards;
+  }
+
+  .logo-row { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+  .shield-wrap {
+    width: 56px; height: 60px;
+    background: linear-gradient(145deg, #4f46e5, #0d9488);
+    border-radius: 14px; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 20px rgba(79,70,229,0.25);
+  }
+  .logo-name {
+    font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; letter-spacing: 6px;
+    background: linear-gradient(135deg, #4f46e5 0%, #0d9488 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .tagline-row {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: white; border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 100px; padding: 6px 16px; font-size: 11.5px;
+    color: var(--muted); font-weight: 500; letter-spacing: 0.5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  .secure-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.7;transform:scale(1.3)} }
+
+  .header-title {
+    font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700;
+    color: var(--text); margin-top: 20px; letter-spacing: -0.4px; text-align: center;
+  }
+  .header-sub {
+    font-size: 14px; color: var(--muted); margin-top: 7px;
+    text-align: center; line-height: 1.65; max-width: 540px;
+  }
+
+  /* Cards */
+  .cards {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    opacity: 0; animation: fadeUp 0.7s ease 0.35s forwards;
+    width: 100%; max-width: 1100px;
+  }
+
+  .card {
+    background: var(--surface); border-radius: 20px;
+    padding: 32px 28px 28px; cursor: pointer; position: relative;
+    overflow: hidden; box-shadow: var(--shadow); border: 1.5px solid transparent;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s, border-color 0.3s;
+    text-decoration: none; color: inherit; display: flex; flex-direction: column;
+  }
+
+  .card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+  .card:active { transform: translateY(-2px); }
+
+  /* Admin card */
+  .card-admin:hover { border-color: rgba(79,70,229,0.35); }
+  .card-admin .card-accent { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+  .card-admin .card-icon-bg { background: rgba(79,70,229,0.09); }
+  .card-admin .card-cta { color: #4f46e5; }
+  .card-admin .card-cta-arrow { background: rgba(79,70,229,0.1); color: #4f46e5; }
+  .card-admin .feat-badge { background: rgba(79,70,229,0.08); color: #4f46e5; border: 1px solid rgba(79,70,229,0.15); }
+
+  /* Institute card */
+  .card-inst:hover { border-color: rgba(13,148,136,0.35); }
+  .card-inst .card-accent { background: linear-gradient(135deg, #0d9488 0%, #059669 100%); }
+  .card-inst .card-icon-bg { background: rgba(13,148,136,0.09); }
+  .card-inst .card-cta { color: #0d9488; }
+  .card-inst .card-cta-arrow { background: rgba(13,148,136,0.1); color: #0d9488; }
+  .card-inst .feat-badge { background: rgba(13,148,136,0.08); color: #0d9488; border: 1px solid rgba(13,148,136,0.15); }
+
+  /* Authority card */
+  .card-auth:hover { border-color: rgba(245,158,11,0.35); }
+  .card-auth .card-accent { background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%); }
+  .card-auth .card-icon-bg { background: rgba(245,158,11,0.09); }
+  .card-auth .card-cta { color: #d97706; }
+  .card-auth .card-cta-arrow { background: rgba(245,158,11,0.1); color: #d97706; }
+  .card-auth .feat-badge { background: rgba(245,158,11,0.08); color: #d97706; border: 1px solid rgba(245,158,11,0.15); }
+
+  .card-accent { position: absolute; top: 0; left: 0; width: 100%; height: 4px; border-radius: 20px 20px 0 0; }
+  .card-icon-bg {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 16px; flex-shrink: 0;
+  }
+  .card-type { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; color: var(--muted); margin-bottom: 6px; }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.6; flex: 1; }
+
+  .feat-badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 20px; }
+  .feat-badge { font-size: 10.5px; font-weight: 600; padding: 4px 9px; border-radius: 6px; }
+
+  .card-cta-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: auto; padding-top: 18px; border-top: 1px solid #f3f4f6;
+  }
+  .card-cta { font-size: 13px; font-weight: 600; }
+  .card-cta-arrow {
+    width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.2s;
+  }
+  .card:hover .card-cta-arrow { transform: translateX(3px); }
+
+  .footer { margin-top: 48px; text-align: center; opacity: 0; animation: fadeUp 0.7s ease 0.6s forwards; }
+  .footer-security {
+    display: inline-flex; align-items: center; gap: 8px; background: white;
+    border: 1px solid rgba(0,0,0,0.07); border-radius: 10px; padding: 10px 20px;
+    font-size: 12px; color: var(--muted); box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  @keyframes fadeUp { 0% { opacity:0; transform:translateY(20px); } 100% { opacity:1; transform:translateY(0); } }
+
+  @media (max-width: 900px) {
+    .cards { grid-template-columns: 1fr; max-width: 440px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-art">
+  <div class="dot-pattern"></div>
+  <div class="bg-blob" style="width:400px;height:400px;top:-100px;left:-120px;background:rgba(79,70,229,0.08);"></div>
+  <div class="bg-blob" style="width:350px;height:350px;bottom:-80px;right:-80px;background:rgba(13,148,136,0.08);"></div>
+</div>
+
+<div class="page">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-row">
+      <div class="shield-wrap">
+        <svg width="28" height="30" viewBox="0 0 48 52" fill="none">
+          <path d="M24 2L44 11V28Q44 44 24 50Q4 44 4 28V11Z" fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.8)" stroke-width="2.5" stroke-linejoin="round"/>
+          <rect x="16.5" y="27" width="15" height="11" rx="2.5" fill="rgba(255,255,255,0.95)"/>
+          <path d="M19.5 27V22Q19.5 17 24 17Q28.5 17 28.5 22V27" fill="none" stroke="rgba(255,255,255,0.95)" stroke-width="2.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="logo-name">VAULTO</div>
+    </div>
+    <div class="tagline-row">
+      <span class="secure-dot"></span>
+      Role-Isolated Secure Exam Delivery Architecture &bull; All Sessions Encrypted
+    </div>
+    <h1 class="header-title">Select Your Application Portal</h1>
+    <p class="header-sub">VaultO enforces strict cryptographic boundaries between the Exam Controller, Centre Workstations, and Mobile Authority Handshakes.</p>
+  </div>
+
+  <!-- 3 Application Cards -->
+  <div class="cards">
+
+    <!-- 1. Admin / Controller App -->
+    <a href="/admin-app/login.html" class="card card-admin">
+      <div class="card-accent"></div>
+      <div class="card-icon-bg">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"><path d="M12 1l9 4v6c0 5.5-3.8 10.7-9 12C3.8 21.7 3 16.5 3 11V5z"/><circle cx="12" cy="10" r="2"/><path d="M12 12v4"/></svg>
+      </div>
+      <div class="card-type">Application 1</div>
+      <div class="card-title">Admin Controller</div>
+      <p class="card-desc">Master exam management, AES-256 paper upload, centre assignment, authority registration, distribution monitor, and emergency kill-switch controls.</p>
+      <div class="feat-badges">
+        <span class="feat-badge">AES-256 Upload</span>
+        <span class="feat-badge">Centres</span>
+        <span class="feat-badge">Kill-Switch</span>
+        <span class="feat-badge">Audit Logs</span>
+      </div>
+      <div class="card-cta-row">
+        <span class="card-cta">Launch Admin App</span>
+        <span class="card-cta-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6,4 10,8 6,12"/></svg></span>
+      </div>
+    </a>
+
+    <!-- 2. Institute / Exam Centre App -->
+    <a href="/institute-app/login.html" class="card card-inst">
+      <div class="card-accent"></div>
+      <div class="card-icon-bg">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2" stroke-linecap="round"><rect x="3" y="10" width="18" height="11" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/><path d="M3 15h18"/></svg>
+      </div>
+      <div class="card-type">Application 2</div>
+      <div class="card-title">Institute Centre App</div>
+      <p class="card-desc">Dedicated examination centre desktop portal. Receive sealed papers, verify SHA-256 integrity, operate offline, dynamic QR challenge, and secure watermarked printing.</p>
+      <div class="feat-badges">
+        <span class="feat-badge">Offline Cache</span>
+        <span class="feat-badge">SHA-256 Check</span>
+        <span class="feat-badge">QR Challenge</span>
+        <span class="feat-badge">Secure Print</span>
+      </div>
+      <div class="card-cta-row">
+        <span class="card-cta">Launch Centre App</span>
+        <span class="card-cta-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6,4 10,8 6,12"/></svg></span>
+      </div>
+    </a>
+
+    <!-- 3. Authority Mobile Authenticator -->
+    <a href="/authority-app/scanner.html" class="card card-auth">
+      <div class="card-accent"></div>
+      <div class="card-icon-bg">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      </div>
+      <div class="card-type">Mobile Companion</div>
+      <div class="card-title">Authority Mobile</div>
+      <p class="card-desc">Companion tool for authorized invigilators. Scan Desktop QR challenge, verify biometrics, hardware fingerprint, and trusted time to release one-time decryption token.</p>
+      <div class="feat-badges">
+        <span class="feat-badge">Biometric Check</span>
+        <span class="feat-badge">HW Device ID</span>
+        <span class="feat-badge">Trusted Time</span>
+        <span class="feat-badge">QR Handshake</span>
+      </div>
+      <div class="card-cta-row">
+        <span class="card-cta">Open Mobile Auth</span>
+        <span class="card-cta-arrow"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6,4 10,8 6,12"/></svg></span>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div class="footer-security">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round"><path d="M8 2L14 5V9C14 12.5 11.5 15 8 15S2 12.5 2 9V5Z"/><polyline points="5.5,8 7,9.5 10.5,6"/></svg>
+      End-to-end encrypted &bull; CERT-In compliant &bull; Multi-Factor Key Wrapping Protocol
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

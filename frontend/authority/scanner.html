@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>VaultO &ndash; Authority Mobile Authenticator</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root {
+    --bg: #09131f;
+    --card: #112233;
+    --card-border: #1b354f;
+    --teal: #0ba888;
+    --teal-glow: rgba(11,168,136,0.3);
+    --indigo: #6366f1;
+    --text: #f8fafc;
+    --muted: #94a3b8;
+    --red: #ef4444;
+    --green: #10b981;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 20px 40px;
+  }
+  .header {
+    width: 100%; max-width: 440px; display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 20px; border-bottom: 1px solid var(--card-border); margin-bottom: 24px;
+  }
+  .logo-row { display: flex; align-items: center; gap: 10px; }
+  .logo-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: 2px; color: #fff; }
+  .badge { background: rgba(11,168,136,0.15); border: 1px solid var(--teal); color: var(--teal); padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 600; }
+
+  .container { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: 20px; }
+  
+  .card {
+    background: var(--card); border: 1px solid var(--card-border); border-radius: 16px;
+    padding: 24px 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+  .card-sub { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+
+  .input-group { margin-bottom: 16px; }
+  .input-label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .input-field {
+    width: 100%; padding: 14px 16px; background: #0b1826; border: 1.5px solid var(--card-border);
+    border-radius: 10px; color: #fff; font-size: 15px; font-family: 'Inter', sans-serif; outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-field:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-glow); }
+
+  .btn {
+    width: 100%; padding: 15px; border-radius: 12px; border: none; font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-teal { background: var(--teal); color: #fff; box-shadow: 0 4px 16px var(--teal-glow); }
+  .btn-teal:active { transform: scale(0.98); }
+  .btn-indigo { background: var(--indigo); color: #fff; }
+
+  .step { display: none; }
+  .step.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+  /* Biometric Animation Prompt */
+  .biometric-box {
+    text-align: center; padding: 30px 20px; background: #0b1826; border-radius: 14px;
+    border: 1.5px solid var(--card-border); margin: 16px 0; cursor: pointer; transition: border-color 0.2s;
+  }
+  .biometric-box:hover { border-color: var(--teal); }
+  .bio-icon-wrap {
+    width: 76px; height: 76px; border-radius: 50%; background: rgba(11,168,136,0.12);
+    border: 2px solid var(--teal); margin: 0 auto 16px; display: flex; align-items: center;
+    justify-content: center; position: relative;
+  }
+  .bio-pulse {
+    position: absolute; inset: -8px; border-radius: 50%; border: 2px solid var(--teal);
+    opacity: 0; animation: bioPulse 2s infinite;
+  }
+  @keyframes bioPulse { 0% { transform:scale(0.95); opacity:0.8; } 100% { transform:scale(1.3); opacity:0; } }
+
+  .info-row { display: flex; justify-content: space-between; font-size: 13px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+  .info-row:last-child { border-bottom: none; }
+  .info-lbl { color: var(--muted); }
+  .info-val { font-weight: 600; color: #fff; text-align: right; }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 100px;
+    font-size: 12px; font-weight: 600;
+  }
+  .status-ok { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid var(--green); }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #fff; color: var(--bg); border-radius: 10px; padding: 12px 24px;
+    font-size: 13px; font-weight: 600; z-index: 9999; transition: transform 0.3s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5); white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo-row">
+    <svg width="28" height="30" viewBox="0 0 34 38" fill="none">
+      <path d="M17 2L31 8V20Q31 32 17 36Q3 32 3 20V8Z" fill="rgba(11,168,136,0.2)" stroke="#0ba888" stroke-width="2"/>
+      <rect x="11" y="21" width="12" height="8" rx="2" fill="#0ba888"/>
+      <path d="M13.5 21V17Q13.5 13 17 13Q20.5 13 20.5 17V21" fill="none" stroke="#0ba888" stroke-width="2"/>
+    </svg>
+    <div>
+      <div class="logo-title">VAULTO</div>
+      <div style="font-size:9px;color:var(--teal);letter-spacing:1px;font-weight:600;">MOBILE AUTHENTICATOR</div>
+    </div>
+  </div>
+  <span class="badge">Official Authority</span>
+</header>
+
+<div class="container">
+
+  <!-- STEP 1: Scan / Enter Challenge -->
+  <div class="card step active" id="step1">
+    <div class="card-title">Authority Scan &amp; Handshake</div>
+    <div class="card-sub">Scan the dynamic QR challenge on the Institute Examination Workstation to authorize question paper decryption.</div>
+
+    <div class="input-group">
+      <label class="input-label">Challenge ID (From Desktop Screen)</label>
+      <input class="input-field" id="challengeInput" placeholder="e.g. QR-174057... or paste QR data" autofocus>
+    </div>
+
+    <div class="input-group">
+      <label class="input-label">Authority ID / Officer PIN</label>
+      <input class="input-field" id="authorityIdInput" value="AUTH-4821" placeholder="e.g. AUTH-4821">
+    </div>
+
+    <button class="btn btn-teal" onclick="handleScanChallenge()">SCAN &amp; VERIFY CHALLENGE &rarr;</button>
+
+    <div style="text-align:center;margin-top:18px;">
+      <span style="font-size:12px;color:var(--muted);">Testing tip: Copy Challenge ID from Desktop QR modal and click Verify.</span>
+    </div>
+  </div>
+
+  <!-- STEP 2: Biometric Verification & Authorization -->
+  <div class="card step" id="step2">
+    <div class="card-title">Biometric Authorization</div>
+    <div class="card-sub" id="examDetailSub">Confirm examination paper details and scan biometric fingerprint/Face ID.</div>
+
+    <div style="background:#0b1826;border-radius:10px;padding:14px;margin-bottom:16px;">
+      <div class="info-row"><span class="info-lbl">Exam Name:</span><span class="info-val" id="det-exam-name">---</span></div>
+      <div class="info-row"><span class="info-lbl">Paper Code:</span><span class="info-val" id="det-paper-code">---</span></div>
+      <div class="info-row"><span class="info-lbl">Exam Centre:</span><span class="info-val" id="det-inst-name">---</span></div>
+      <div class="info-row"><span class="info-lbl">Hardware Check:</span><span class="info-val" style="color:var(--teal);">✓ Registered Mobile Device</span></div>
+      <div class="info-row"><span class="info-lbl">Trusted NTP Time:</span><span class="info-val" style="color:var(--green);">✓ In Unlock Window</span></div>
+    </div>
+
+    <!-- Biometric Button Trigger -->
+    <div class="biometric-box" id="bioBox" onclick="triggerBiometricAuth()">
+      <div class="bio-icon-wrap">
+        <div class="bio-pulse"></div>
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round">
+          <path d="M12 11c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v3c0 1.66 1.34 3 3 3z"/>
+          <path d="M5 10v1a7 7 0 0 0 14 0v-1M12 18v4M8 22h8"/>
+        </svg>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;" id="bioPromptText">Tap to Scan Biometric (Touch ID / Face ID)</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px;">Cryptographically wraps one-time key release token</div>
+    </div>
+
+    <button class="btn btn-teal" id="btn-submit-auth" onclick="submitAuthorization()" disabled style="opacity:0.5;">
+      GRANT DECRYPTION AUTHORIZATION &rarr;
+    </button>
+  </div>
+
+  <!-- STEP 3: Approval Success -->
+  <div class="card step" id="step3" style="text-align:center;">
+    <div style="width:70px;height:70px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid var(--green);margin:0 auto 16px;display:flex;align-items:center;justify-content:center;">
+      <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div class="card-title" style="color:var(--green);font-size:22px;">Authorization Approved!</div>
+    <p style="font-size:13px;color:var(--muted);margin:10px 0 20px;line-height:1.6;">
+      One-time cryptographic unlock token has been transmitted to the Institute Examination Workstation. Decryption is now unlocked on desktop.
+    </p>
+
+    <div class="status-badge status-ok" style="margin-bottom:24px;">
+      ✓ Immutable Audit Log Recorded
+    </div>
+
+    <button class="btn btn-indigo" onclick="resetFlow()">Scan Another Challenge</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+  let activeChallenge = null;
+  let biometricVerified = false;
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+
+  function setStep(id) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  async function handleScanChallenge() {
+    let input = document.getElementById('challengeInput').value.trim();
+    if (!input) {
+      alert('Please enter a Challenge ID.');
+      return;
+    }
+
+    // Parse JSON if entire QR string pasted
+    if (input.startsWith('{')) {
+      try {
+        const obj = JSON.parse(input);
+        if (obj.challengeId) input = obj.challengeId;
+      } catch(e) {}
+    }
+
+    showToast('Validating challenge with server...');
+
+    try {
+      const res = await fetch('/authority/scan-challenge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ challengeId: input })
+      });
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        activeChallenge = data.data;
+        document.getElementById('det-exam-name').textContent = activeChallenge.examName;
+        document.getElementById('det-paper-code').textContent = activeChallenge.paperCode;
+        document.getElementById('det-inst-name').textContent = activeChallenge.instituteName;
+        setStep('step2');
+      } else {
+        alert(data.message || 'Invalid or expired QR challenge.');
+      }
+    } catch(e) {
+      alert('Network error. Check backend server.');
+    }
+  }
+
+  function triggerBiometricAuth() {
+    document.getElementById('bioPromptText').textContent = 'Authenticating Fingerprint / Face ID...';
+    
+    // Simulate mobile biometric hardware delay and approval
+    setTimeout(() => {
+      biometricVerified = true;
+      document.getElementById('bioPromptText').textContent = '✓ Biometric Verified: Dr. Rajesh Kumar';
+      document.getElementById('bioBox').style.borderColor = 'var(--green)';
+      document.getElementById('bioBox').style.background = 'rgba(16,185,129,0.08)';
+      
+      const btn = document.getElementById('btn-submit-auth');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      showToast('Biometric verified successfully');
+    }, 900);
+  }
+
+  async function submitAuthorization() {
+    if (!biometricVerified || !activeChallenge) return;
+
+    const authorityId = document.getElementById('authorityIdInput').value.trim() || 'AUTH-4821';
+    const btn = document.getElementById('btn-submit-auth');
+    btn.disabled = true; btn.textContent = 'Transmitting Cryptographic Token...';
+
+    try {
+      const res = await fetch('/authority/authorize-decryption', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          challengeId: activeChallenge.challengeId,
+          authorityId: authorityId,
+          deviceId: 'MOB-DEVICE-HW-994',
+          biometricProof: true
+        })
+      });
+      const data = await res.json();
+      btn.disabled = false; btn.textContent = 'GRANT DECRYPTION AUTHORIZATION →';
+
+      if (res.ok && data.success) {
+        showToast('Decryption Authorized!');
+        setStep('step3');
+      } else {
+        alert(data.message || 'Authorization rejected.');
+      }
+    } catch(e) {
+      btn.disabled = false; btn.textContent = 'GRANT DECRYPTION AUTHORIZATION →';
+      alert('Network error submitting authorization.');
+    }
+  }
+
+  function resetFlow() {
+    document.getElementById('challengeInput').value = '';
+    biometricVerified = false;
+    document.getElementById('bioPromptText').textContent = 'Tap to Scan Biometric (Touch ID / Face ID)';
+    document.getElementById('bioBox').style.borderColor = 'var(--card-border)';
+    document.getElementById('bioBox').style.background = '#0b1826';
+    setStep('step1');
+  }
+
+  // Pre-fill challenge if in URL params ?challengeId=...
+  window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const cid = params.get('challengeId') || params.get('cid');
+    if (cid) {
+      document.getElementById('challengeInput').value = cid;
+      handleScanChallenge();
+    }
+  });
+</script>
+</body>
+</html>

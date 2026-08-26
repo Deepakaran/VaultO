@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VaultO &ndash; Splash</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --white:   #ffffff;
+  --off:     #f5f7fa;
+  --teal:    #0ba888;
+  --teal2:   #0ec49e;
+  --teallt:  #e6f7f3;
+  --navy:    #0d2137;
+  --navy2:   #1a3a55;
+  --mid:     #6b8ba4;
+  --light:   #c8dde8;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: var(--white);
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* â”€â”€â”€ FULL SCREEN CONTAINER â”€â”€â”€ */
+.splash {
+  position: fixed;
+  inset: 0;
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  will-change: opacity;
+  animation: splashFadeOut 0.6s ease 5.0s forwards;
+}
+
+@keyframes splashFadeOut {
+  to { opacity: 0; pointer-events: none; }
+}
+
+/* â”€â”€â”€ BACKGROUND GEOMETRY â”€â”€â”€ */
+.bg-geo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Large subtle arc top-left */
+.arc1 {
+  position: absolute;
+  top: -220px; left: -220px;
+  width: 680px; height: 680px;
+  border-radius: 50%;
+  border: 80px solid rgba(11,168,136,0.06);
+  animation: arcGrow 1.2s cubic-bezier(0.4,0,0.2,1) 0.1s both;
+  will-change: transform, opacity;
+}
+.arc2 {
+  position: absolute;
+  top: -120px; left: -120px;
+  width: 480px; height: 480px;
+  border-radius: 50%;
+  border: 50px solid rgba(11,168,136,0.04);
+  animation: arcGrow 1.2s cubic-bezier(0.4,0,0.2,1) 0.25s both;
+  will-change: transform, opacity;
+}
+
+@keyframes arcGrow {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* Bottom-right accent */
+.arc3 {
+  position: absolute;
+  bottom: -180px; right: -180px;
+  width: 560px; height: 560px;
+  border-radius: 50%;
+  border: 60px solid rgba(13,33,55,0.04);
+  animation: arcGrow 1.2s cubic-bezier(0.4,0,0.2,1) 0.35s both;
+  will-change: transform, opacity;
+}
+
+/* Fine dot grid */
+.dot-grid {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(11,168,136,0.18) 1px, transparent 1px);
+  background-size: 36px 36px;
+  opacity: 0;
+  animation: fadeIn 1s ease 0.4s both;
+  will-change: opacity;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+
+/* Diagonal stripe accents */
+.stripe {
+  position: absolute;
+  width: 3px;
+  background: linear-gradient(to bottom, transparent, rgba(11,168,136,0.2), transparent);
+  border-radius: 2px;
+  opacity: 0;
+  animation: stripeRise 0.8s ease var(--sd, 0.5s) both;
+  will-change: transform, opacity;
+}
+@keyframes stripeRise {
+  from { transform: scaleY(0); opacity: 0; }
+  to   { transform: scaleY(1); opacity: 1; }
+}
+
+/* â”€â”€â”€ CENTER CONTENT â”€â”€â”€ */
+.center {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* â”€â”€ SHIELD â”€â”€ */
+.shield-wrap {
+  position: relative;
+  width: 140px; height: 160px;
+  margin-bottom: 36px;
+  opacity: 0;
+  animation: shieldDrop 0.7s cubic-bezier(0.34,1.45,0.64,1) 0.5s both;
+  will-change: transform, opacity;
+}
+@keyframes shieldDrop {
+  from { transform: translateY(-30px) scale(0.85); opacity: 0; }
+  to   { transform: translateY(0)     scale(1);    opacity: 1; }
+}
+
+/* Shield glow ring - pure CSS, no filter */
+.shield-ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  border: 2px solid rgba(11,168,136,0.15);
+  animation: ringPulse 2.4s ease-in-out 1.8s infinite;
+  will-change: transform, opacity;
+}
+.shield-ring2 {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 210px; height: 210px;
+  border-radius: 50%;
+  border: 1px solid rgba(11,168,136,0.08);
+  animation: ringPulse 2.4s ease-in-out 2.1s infinite;
+  will-change: transform, opacity;
+}
+@keyframes ringPulse {
+  0%, 100% { transform: translate(-50%,-50%) scale(1);    opacity: 1; }
+  50%       { transform: translate(-50%,-50%) scale(1.08); opacity: 0.4; }
+}
+
+/* SVG shield - stroke draw */
+.shield-svg {
+  width: 140px; height: 160px;
+  overflow: visible;
+}
+
+.s-outer {
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: drawPath 1s cubic-bezier(0.4,0,0.2,1) 0.7s forwards;
+  will-change: stroke-dashoffset;
+}
+.s-inner {
+  stroke-dasharray: 400;
+  stroke-dashoffset: 400;
+  animation: drawPath 0.9s cubic-bezier(0.4,0,0.2,1) 0.9s forwards;
+  will-change: stroke-dashoffset;
+}
+@keyframes drawPath {
+  to { stroke-dashoffset: 0; }
+}
+
+.s-fill {
+  opacity: 0;
+  animation: fadeIn 0.5s ease 1.4s both;
+}
+.s-lock {
+  opacity: 0;
+  animation: lockPop 0.55s cubic-bezier(0.34,1.56,0.64,1) 1.6s both;
+  will-change: transform, opacity;
+  transform-origin: 70px 82px;
+}
+@keyframes lockPop {
+  from { transform: scale(0.3); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.s-clock {
+  opacity: 0;
+  animation: lockPop 0.55s cubic-bezier(0.34,1.56,0.64,1) 1.85s both;
+  will-change: transform, opacity;
+  transform-origin: 98px 98px;
+}
+
+/* â”€â”€ WORDMARK â”€â”€ */
+.wordmark {
+  display: flex;
+  gap: 0;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.letter {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(52px, 8vw, 80px);
+  font-weight: 800;
+  color: var(--navy);
+  letter-spacing: 8px;
+  line-height: 1;
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(24px);
+  will-change: transform, opacity;
+}
+
+.letter:nth-child(1) { animation: letterUp 0.4s cubic-bezier(0.34,1.2,0.64,1) 1.9s both; }
+.letter:nth-child(2) { animation: letterUp 0.4s cubic-bezier(0.34,1.2,0.64,1) 1.98s both; }
+.letter:nth-child(3) { animation: letterUp 0.4s cubic-bezier(0.34,1.2,0.64,1) 2.06s both; }
+.letter:nth-child(4) { animation: letterUp 0.4s cubic-bezier(0.34,1.2,0.64,1) 2.14s both; }
+.letter:nth-child(5) { animation: letterUp 0.4s cubic-bezier(0.34,1.2,0.64,1) 2.22s both; }
+.letter:nth-child(6) { animation: letterUp 0.4s cubic-bezier(0.34,1.2,0.64,1) 2.30s both; color: var(--teal); }
+
+@keyframes letterUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Underline accent */
+.wordline {
+  height: 3px;
+  background: linear-gradient(to right, var(--teal) 0%, rgba(11,168,136,0.15) 100%);
+  border-radius: 2px;
+  width: 0;
+  margin-bottom: 16px;
+  animation: lineGrow 0.7s ease 2.55s both;
+  will-change: width;
+}
+@keyframes lineGrow {
+  to { width: 100%; }
+}
+
+/* â”€â”€ TAGLINE â”€â”€ */
+.tagline {
+  font-size: clamp(10px, 1.4vw, 13px);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--mid);
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 2.8s both;
+  text-align: center;
+}
+
+/* â”€â”€ PROGRESS â”€â”€ */
+.progress-area {
+  margin-top: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  opacity: 0;
+  animation: fadeIn 0.5s ease 3.0s both;
+}
+
+.progress-track {
+  width: clamp(180px, 22vw, 260px);
+  height: 2px;
+  background: rgba(11,168,136,0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 0;
+  background: linear-gradient(to right, var(--teal), var(--teal2));
+  border-radius: 2px;
+  animation: progressFill 2s cubic-bezier(0.4,0,0.2,1) 3.0s both;
+  will-change: width;
+}
+@keyframes progressFill {
+  to { width: 100%; }
+}
+
+/* Shimmer on progress */
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 40px; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.8), transparent);
+  animation: shimmer 0.8s ease 3.2s infinite;
+  will-change: transform;
+}
+@keyframes shimmer {
+  from { transform: translateX(-40px); }
+  to   { transform: translateX(20px); }
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  animation: blink 1s ease-in-out 3.0s infinite alternate;
+  will-change: opacity;
+}
+@keyframes blink {
+  from { opacity: 1; }
+  to   { opacity: 0.2; }
+}
+
+.status-text {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--mid);
+  font-weight: 400;
+}
+
+/* â”€â”€ CORNER MARKS â”€â”€ */
+.corner {
+  position: absolute;
+  width: 22px; height: 22px;
+  opacity: 0;
+  animation: fadeIn 0.4s ease 0.8s both;
+}
+.corner-tl { top: 28px; left: 28px; border-top: 2px solid rgba(11,168,136,0.3); border-left: 2px solid rgba(11,168,136,0.3); }
+.corner-tr { top: 28px; right: 28px; border-top: 2px solid rgba(11,168,136,0.3); border-right: 2px solid rgba(11,168,136,0.3); }
+.corner-bl { bottom: 28px; left: 28px; border-bottom: 2px solid rgba(11,168,136,0.3); border-left: 2px solid rgba(11,168,136,0.3); }
+.corner-br { bottom: 28px; right: 28px; border-bottom: 2px solid rgba(11,168,136,0.3); border-right: 2px solid rgba(11,168,136,0.3); }
+
+/* â”€â”€ SECURITY CHIPS (bottom row) â”€â”€ */
+.chips {
+  position: absolute;
+  bottom: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 3.4s both;
+  white-space: nowrap;
+}
+
+.chip {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 14px;
+  background: var(--teallt);
+  border: 1px solid rgba(11,168,136,0.18);
+  border-radius: 100px;
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: var(--teal);
+  font-weight: 400;
+}
+.chip-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--teal);
+  flex-shrink: 0;
+}
+
+/* â”€â”€ VERSION BADGE â”€â”€ */
+.version {
+  position: absolute;
+  top: 30px;
+  right: 36px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--light);
+  text-transform: uppercase;
+  opacity: 0;
+  animation: fadeIn 0.5s ease 1.2s both;
+}
+
+/* After splash: main content placeholder */
+.main-content {
+  position: fixed;
+  inset: 0;
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 5.5s both;
+  font-family: 'Syne', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: 2px;
+}
+</style>
+</head>
+<body>
+
+<!-- â•â•â• SPLASH â•â•â• -->
+<div class="splash" id="splash">
+
+  <!-- Background -->
+  <div class="bg-geo">
+    <div class="arc1"></div>
+    <div class="arc2"></div>
+    <div class="arc3"></div>
+    <div class="dot-grid"></div>
+
+    <!-- Vertical accent stripes -->
+    <div class="stripe" style="left:18%; height:55vh; top:0; --sd:0.6s;"></div>
+    <div class="stripe" style="right:18%; height:45vh; bottom:0; --sd:0.75s; transform-origin:bottom;"></div>
+    <div class="stripe" style="left:50%; height:30vh; top:0; --sd:0.9s; opacity:0.5;"></div>
+  </div>
+
+  <!-- Corner marks -->
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <!-- Version -->
+  <div class="version">v1.0</div>
+
+  <!-- Center -->
+  <div class="center">
+
+    <!-- Shield -->
+    <div class="shield-wrap">
+      <div class="shield-ring"></div>
+      <div class="shield-ring2"></div>
+
+      <svg class="shield-svg" viewBox="0 0 140 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer shield fill -->
+        <path class="s-fill"
+          d="M70 8 L126 32 L126 82 Q126 130 70 152 Q14 130 14 82 L14 32 Z"
+          fill="url(#shieldGrad)"/>
+
+        <!-- Outer shield stroke -->
+        <path class="s-outer"
+          d="M70 8 L126 32 L126 82 Q126 130 70 152 Q14 130 14 82 L14 32 Z"
+          fill="none" stroke="#0ba888" stroke-width="2.5" stroke-linejoin="round"/>
+
+        <!-- Inner shield stroke -->
+        <path class="s-inner"
+          d="M70 20 L114 40 L114 82 Q114 120 70 140 Q26 120 26 82 L26 40 Z"
+          fill="none" stroke="rgba(11,168,136,0.3)" stroke-width="1.5" stroke-linejoin="round"/>
+
+        <!-- Lock body -->
+        <g class="s-lock">
+          <rect x="51" y="78" width="30" height="22" rx="5" fill="#0ba888"/>
+          <path d="M57 78 L57 69 Q57 59 70 59 Q83 59 83 69 L83 78"
+            fill="none" stroke="#0ba888" stroke-width="3.5" stroke-linecap="round"/>
+          <circle cx="70" cy="89" r="4" fill="white" opacity="0.9"/>
+          <rect x="68.5" y="89" width="3" height="5" rx="1.5" fill="white" opacity="0.9"/>
+        </g>
+
+        <!-- Clock -->
+        <g class="s-clock">
+          <circle cx="98" cy="102" r="13" fill="white" stroke="#0ba888" stroke-width="2"/>
+          <line x1="98" y1="102" x2="98" y2="94" stroke="#0ba888" stroke-width="2" stroke-linecap="round"/>
+          <line x1="98" y1="102" x2="104" y2="105" stroke="#0ba888" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="98" cy="102" r="2" fill="#0ba888"/>
+        </g>
+
+        <!-- Gradient def -->
+        <defs>
+          <linearGradient id="shieldGrad" x1="70" y1="8" x2="70" y2="152" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="rgba(11,168,136,0.10)"/>
+            <stop offset="100%" stop-color="rgba(11,168,136,0.04)"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+
+    <!-- Wordmark -->
+    <div class="wordmark">
+      <span class="letter">V</span>
+      <span class="letter">A</span>
+      <span class="letter">U</span>
+      <span class="letter">L</span>
+      <span class="letter">T</span>
+      <span class="letter">O</span>
+    </div>
+
+    <div class="wordline"></div>
+
+    <div class="tagline">Secure Exam Delivery System</div>
+
+    <!-- Progress -->
+    <div class="progress-area">
+      <div class="progress-track">
+        <div class="progress-fill"></div>
+      </div>
+      <div class="status-row">
+        <div class="status-dot"></div>
+        <div class="status-text">Initializing secure session</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom chips -->
+  <div class="chips">
+    <div class="chip"><span class="chip-dot"></span>AES-256</div>
+    <div class="chip"><span class="chip-dot"></span>Offline-First</div>
+    <div class="chip"><span class="chip-dot"></span>Time-Locked</div>
+    <div class="chip"><span class="chip-dot"></span>Zero-Trust</div>
+  </div>
+
+</div>
+
+<!-- After splash -->
+<div class="main-content">App Loaded âœ“</div>
+
+</body>
+</html>

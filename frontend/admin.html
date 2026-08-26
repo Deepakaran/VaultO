@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VaultO &ndash; Admin Controller Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#f4f7fb;
+  --surface:#ffffff;
+  --navy:#0d2137;
+  --navy2:#1a3a55;
+  --indigo:#4f46e5;
+  --indigo-lt:#eef2ff;
+  --teal:#0ba888;
+  --teal-lt:#e6f7f3;
+  --mid:#5a7a96;
+  --border:#e2eaf3;
+  --text:#0d2137;
+  --text2:#5a7a96;
+  --red:#e8445a;
+  --red-lt:#fdeef1;
+  --amber:#f59e0b;
+  --amber-lt:#fef3c7;
+  --green:#16a34a;
+  --green-lt:#dcfce7;
+  --shadow:0 1px 4px rgba(13,33,55,0.07);
+  --shadow-md:0 4px 16px rgba(13,33,55,0.10);
+  --r:10px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  height:62px;
+  display:flex;align-items:center;
+  padding:0 28px;
+  box-shadow:0 1px 8px rgba(13,33,55,0.06);
+}
+.logo-area{display:flex;align-items:center;gap:11px;text-decoration:none;}
+.logo-shield{width:34px;height:38px;}
+.logo-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--navy);letter-spacing:3px;}
+.logo-dot{color:var(--indigo);}
+.logo-sub{font-size:9px;letter-spacing:2px;color:var(--indigo);font-weight:600;margin-top:1px;text-transform:uppercase;}
+.header-tag{
+  margin-left:24px;background:var(--indigo-lt);border:1px solid rgba(79,70,229,0.2);
+  color:var(--indigo);font-size:11px;font-weight:600;padding:4px 12px;border-radius:100px;
+  display:flex;align-items:center;gap:6px;letter-spacing:0.5px;
+}
+.tag-dot{width:6px;height:6px;border-radius:50%;background:var(--indigo);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(1.2);}}
+
+.header-right{margin-left:auto;display:flex;align-items:center;gap:14px;}
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--indigo);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;
+  cursor:pointer;flex-shrink:0;
+}
+
+/* ── LAYOUT & SIDEBAR ── */
+.layout{display:flex;min-height:calc(100vh - 62px);}
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:20px 12px;
+  display:flex;flex-direction:column;gap:4px;
+  position:sticky;top:62px;height:calc(100vh - 62px);
+  overflow-y:auto;
+}
+.sb-label{font-size:9px;letter-spacing:2px;color:var(--text2);text-transform:uppercase;padding:10px 10px 6px;font-weight:600;}
+.sb-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:8px;
+  font-size:13px;color:var(--text2);
+  background:none;border:none;cursor:pointer;
+  width:100%;text-align:left;
+  transition:all 0.15s;font-family:'DM Sans',sans-serif;font-weight:500;
+}
+.sb-item:hover{background:var(--bg);color:var(--text);}
+.sb-item.active{background:var(--indigo-lt);color:var(--indigo);font-weight:600;}
+.sb-item svg{flex-shrink:0;opacity:0.75;}
+.sb-item.active svg{opacity:1;}
+.sb-sep{height:1px;background:var(--border);margin:8px 0;}
+
+/* ── MAIN CONTENT ── */
+.main{flex:1;padding:28px;min-width:0;}
+.page-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;}
+.page-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-0.3px;}
+.page-sub{font-size:13px;color:var(--text2);margin-top:3px;}
+.date-chip{font-size:11px;color:var(--text2);background:var(--surface);border:1px solid var(--border);padding:6px 14px;border-radius:100px;}
+
+/* ── STATS & GRIDS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{
+  background:var(--surface);border-radius:var(--r);
+  border:1px solid var(--border);padding:20px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--accent,var(--indigo));
+}
+.stat-icon{
+  width:38px;height:38px;border-radius:9px;
+  background:var(--icon-bg,var(--indigo-lt));
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:12px;
+}
+.stat-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--navy);line-height:1;}
+.stat-lbl{font-size:12px;color:var(--text2);margin-top:5px;}
+.stat-delta{margin-top:8px;font-size:11px;font-weight:600;color:var(--green);}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;}
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;margin-bottom:20px;}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);}
+.card-title{font-size:14px;font-weight:600;color:var(--navy);}
+.card-action{font-size:12px;color:var(--indigo);background:none;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:6px;}
+.card-action:hover{background:var(--indigo-lt);}
+.card-body{padding:18px 20px;}
+
+/* ── QUICK ACTIONS ── */
+.qa-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:18px 20px;}
+.qa-btn{
+  display:flex;align-items:center;gap:12px;
+  padding:14px;border-radius:9px;
+  background:var(--bg);border:1px solid var(--border);
+  cursor:pointer;transition:all 0.18s;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--navy);
+}
+.qa-btn:hover{background:var(--indigo-lt);border-color:rgba(79,70,229,0.3);color:var(--indigo);}
+.qa-btn:hover .qa-icon{background:var(--indigo);color:#fff;}
+.qa-icon{
+  width:34px;height:34px;border-radius:8px;
+  background:var(--surface);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;color:var(--indigo);transition:all 0.18s;
+}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{border-bottom:1px solid var(--border);background:#fafcff;}
+th{padding:12px 16px;text-align:left;font-size:10px;font-weight:600;letter-spacing:1.2px;color:var(--text2);text-transform:uppercase;white-space:nowrap;}
+td{padding:13px 16px;border-bottom:1px solid var(--border);color:var(--navy);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:#fbfdff;}
+
+/* ── CHIPS ── */
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600;white-space:nowrap;}
+.chip-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.chip.locked{background:#f1f4f9;color:#5a7a96;}
+.chip.locked .chip-dot{background:#5a7a96;}
+.chip.unlocked{background:var(--green-lt);color:var(--green);}
+.chip.unlocked .chip-dot{background:var(--green);}
+.chip.active{background:var(--green-lt);color:var(--green);}
+.chip.active .chip-dot{background:var(--green);}
+.chip.blocked{background:var(--red-lt);color:var(--red);}
+.chip.blocked .chip-dot{background:var(--red);}
+.chip.revoked{background:var(--red-lt);color:var(--red);}
+.chip.revoked .chip-dot{background:var(--red);}
+.chip.accessed{background:#dbeafe;color:#2563eb;}
+.chip.accessed .chip-dot{background:#2563eb;}
+
+/* ── BUTTONS ── */
+.btn-primary{
+  padding:9px 18px;border-radius:8px;border:none;
+  background:var(--indigo);color:#fff;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.18s;
+  display:inline-flex;align-items:center;gap:7px;
+}
+.btn-primary:hover{background:var(--navy2);}
+.btn-danger{
+  padding:9px 18px;border-radius:8px;border:none;
+  background:var(--red);color:#fff;font-size:13px;font-weight:600;
+  cursor:pointer;font-family:'DM Sans',sans-serif;
+}
+.btn-danger:hover{background:#dc2626;}
+.btn-cancel{padding:9px 18px;border-radius:8px;border:1px solid var(--border);background:var(--surface);font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text2);}
+.btn-cancel:hover{background:var(--bg);}
+.tbl-btn{padding:5px 11px;border-radius:6px;font-size:11px;font-weight:600;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--navy);transition:all 0.15s;}
+.tbl-btn:hover{background:var(--bg);}
+.tbl-btn.danger{border-color:rgba(232,68,90,0.3);color:var(--red);}
+.tbl-btn.danger:hover{background:var(--red-lt);}
+.tbl-btn.primary{border-color:rgba(79,70,229,0.3);color:var(--indigo);}
+.tbl-btn.primary:hover{background:var(--indigo-lt);}
+
+/* ── ACTIVITY FEED ── */
+.activity-list{display:flex;flex-direction:column;}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);}
+.activity-item:last-child{border-bottom:none;}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.act-dot.ok{background:var(--green);}
+.act-dot.fail{background:var(--red);}
+.act-dot.warn{background:var(--amber);}
+.act-msg{font-size:13px;color:var(--navy);line-height:1.4;}
+.act-meta{font-size:11px;color:var(--text2);margin-top:2px;}
+.act-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;margin-left:auto;}
+.act-badge.ok{background:var(--green-lt);color:var(--green);}
+.act-badge.fail{background:var(--red-lt);color:var(--red);}
+.act-badge.warn{background:var(--amber-lt);color:var(--amber);}
+
+/* ── SECTION VISIBILITY ── */
+.section{display:none;}
+.section.active{display:block;}
+
+/* ── MODALS ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(13,33,55,0.45);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border-radius:14px;width:520px;max-width:92vw;box-shadow:var(--shadow-md);animation:modalIn 0.25s cubic-bezier(0.34,1.3,0.64,1);}
+@keyframes modalIn{from{transform:scale(0.92);opacity:0;}to{transform:scale(1);opacity:1;}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--border);}
+.modal-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--navy);}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text2);padding:4px;border-radius:6px;}
+.modal-body{padding:20px 24px;max-height:75vh;overflow-y:auto;}
+.form-group{margin-bottom:16px;}
+.form-label{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--text2);font-weight:600;margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:10px 13px;border-radius:8px;border:1px solid var(--border);background:var(--bg);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--navy);outline:none;transition:border-color 0.2s;}
+.form-input:focus{border-color:var(--indigo);background:#fff;}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;padding:16px 24px;border-top:1px solid var(--border);}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;border-radius:10px;padding:12px 22px;font-size:13px;display:flex;align-items:center;gap:10px;z-index:9999;transition:transform 0.3s cubic-bezier(0.34,1.4,0.64,1);box-shadow:var(--shadow-md);}
+.toast.show{transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="logo-area" href="#">
+    <svg class="logo-shield" viewBox="0 0 34 38" fill="none">
+      <path d="M17 2L31 8V20Q31 32 17 36Q3 32 3 20V8Z" fill="rgba(79,70,229,0.12)" stroke="#4f46e5" stroke-width="2" stroke-linejoin="round"/>
+      <rect x="11" y="21" width="12" height="8" rx="2" fill="#4f46e5"/>
+      <path d="M13.5 21V17Q13.5 13 17 13Q20.5 13 20.5 17V21" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <div class="logo-name">VAULT<span class="logo-dot">O</span></div>
+      <div class="logo-sub">Admin / Controller</div>
+    </div>
+  </a>
+
+  <div class="header-tag">
+    <span class="tag-dot"></span> Central Controller Node &bull; All Endpoints Secured
+  </div>
+
+  <div class="header-right">
+    <div class="date-chip" id="live-date">Loading date...</div>
+    <div class="avatar" id="adminAvatar" title="Controller Administrator">AD</div>
+    <button onclick="doLogout()" style="display:flex;align-items:center;gap:6px;background:var(--red-lt);border:1px solid rgba(232,68,90,0.2);color:var(--red);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 14H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h3"/><polyline points="11,11 14,8 11,5"/><line x1="14" y1="8" x2="6" y2="8"/></svg>
+      Logout
+    </button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-label">Main Console</div>
+    <button class="sb-item active" onclick="showSection('overview', this)">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+      Overview
+    </button>
+    <button class="sb-item" onclick="showSection('papers', this)">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2H4a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5V5.5L10 2z"/><polyline points="10,2 10,5.5 13.5,5.5"/></svg>
+      Exam Papers &amp; Upload
+    </button>
+    <button class="sb-item" onclick="showSection('distribution', this)">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><path d="M8 2v6l4 2"/></svg>
+      Distribution Monitor
+    </button>
+
+    <div class="sb-sep"></div>
+    <div class="sb-label">Access &amp; Centre Provisioning</div>
+    <button class="sb-item" onclick="showSection('institutes', this)">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 14V7l5-5 5 5v7"/><path d="M6 14v-4h4v4"/></svg>
+      Exam Centres
+    </button>
+    <button class="sb-item" onclick="showSection('authorities', this)">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2L13 4.5V9C13 12 10.5 14.5 8 15C5.5 14.5 3 12 3 9V4.5Z"/><circle cx="8" cy="7.5" r="1.5"/></svg>
+      Authorized Authorities
+    </button>
+    <button class="sb-item" onclick="showSection('devices', this)">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="3" width="12" height="9" rx="2"/><line x1="6" y1="14" x2="10" y2="14"/><line x1="8" y1="12" x2="8" y2="14"/></svg>
+      Registered Devices
+    </button>
+
+    <div class="sb-sep"></div>
+    <div class="sb-label">Security &amp; Emergency</div>
+    <button class="sb-item" onclick="showSection('emergency', this)" style="color:var(--red);">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--red)" stroke-width="1.6"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="9"/><circle cx="8" cy="11.5" r="0.5" fill="var(--red)"/></svg>
+      Emergency Kill-Switch
+    </button>
+    <button class="sb-item" onclick="showSection('logs', this)">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 8h6M5 5h3M5 11h4"/></svg>
+      Audit Logs &amp; Reports
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── 1. OVERVIEW ── -->
+    <div class="section active" id="sec-overview">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Controller Overview</div>
+          <div class="page-sub">Centralized monitor and security dispatch</div>
+        </div>
+        <button class="btn-primary" onclick="openModal('upload-paper')">+ Encrypt &amp; Upload Paper</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card" style="--accent:#4f46e5;--icon-bg:#eef2ff;">
+          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#4f46e5" stroke-width="1.8"><path d="M3 14V7l5-5 5 5v7"/><path d="M6 14v-4h4v4"/></svg></div>
+          <div class="stat-val" id="st-total-inst">--</div>
+          <div class="stat-lbl">Registered Centres</div>
+          <div class="stat-delta" id="st-inst-delta">Loading...</div>
+        </div>
+        <div class="stat-card" style="--accent:#0ba888;--icon-bg:#e6f7f3;">
+          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#0ba888" stroke-width="1.8"><path d="M10 2H4a1.5 1.5 0 0 0-1.5 1.5v9A1.5 1.5 0 0 0 4 14h8a1.5 1.5 0 0 0 1.5-1.5V5.5L10 2z"/></svg></div>
+          <div class="stat-val" id="st-total-papers">--</div>
+          <div class="stat-lbl">Sealed Papers (AES-256)</div>
+          <div class="stat-delta">Tamper-Free Ledger</div>
+        </div>
+        <div class="stat-card" style="--accent:#16a34a;--icon-bg:#dcfce7;">
+          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#16a34a" stroke-width="1.8"><circle cx="8" cy="8" r="6"/><polyline points="5 8 7 10 11 6"/></svg></div>
+          <div class="stat-val" id="st-active-centres">--</div>
+          <div class="stat-lbl">Active Centres</div>
+          <div class="stat-delta">100% Operational</div>
+        </div>
+        <div class="stat-card" style="--accent:#f59e0b;--icon-bg:#fef3c7;">
+          <div class="stat-icon"><svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="#f59e0b" stroke-width="1.8"><path d="M8 2v10M4 9l4 5 4-5"/><line x1="3" y1="14" x2="13" y2="14"/></svg></div>
+          <div class="stat-val" id="st-total-prints">--</div>
+          <div class="stat-lbl">Authorized Prints</div>
+          <div class="stat-delta">Logged with Watermarks</div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <div class="card-head"><span class="card-title">Quick Actions</span></div>
+          <div class="qa-grid">
+            <button class="qa-btn" onclick="openInstModal()">
+              <div class="qa-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 14V7l5-5 5 5v7"/></svg></div>
+              Create Exam Centre
+            </button>
+            <button class="qa-btn" onclick="openModal('upload-paper')">
+              <div class="qa-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2v8M4 6l4-4 4 4"/><path d="M3 13h10"/></svg></div>
+              Upload &amp; Encrypt Paper
+            </button>
+            <button class="qa-btn" onclick="openModal('register-auth')">
+              <div class="qa-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 2L13 4.5V9C13 12 10.5 14.5 8 15C5.5 14.5 3 12 3 9V4.5Z"/></svg></div>
+              Register Authority
+            </button>
+            <button class="qa-btn" onclick="showSection('emergency')" style="color:var(--red);">
+              <div class="qa-icon" style="color:var(--red);"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="9"/><circle cx="8" cy="11.5" r="0.5" fill="currentColor"/></svg></div>
+              Emergency Controls
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><span class="card-title">Live Controller Event Feed</span></div>
+          <div class="activity-list" id="overview-feed">
+            <div style="padding:20px;text-align:center;color:var(--text2);font-size:12px;">Loading events...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 2. EXAM PAPERS & UPLOAD ── -->
+    <div class="section" id="sec-papers">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Exam Papers &amp; Master Encryption</div>
+          <div class="page-sub">Upload, encrypt with AES-256-CBC, and distribute papers to exam centres</div>
+        </div>
+        <button class="btn-primary" onclick="openModal('upload-paper')">+ Encrypt &amp; Upload New Paper</button>
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Exam ID</th>
+                <th>Paper Code</th>
+                <th>Subject / Name</th>
+                <th>Assigned Centres</th>
+                <th>Exam Date</th>
+                <th>Unlock Schedule</th>
+                <th>SHA-256 Integrity</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="papers-tbody">
+              <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text2);">Loading exam papers...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 3. DISTRIBUTION MONITOR ── -->
+    <div class="section" id="sec-distribution">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Paper Distribution Monitor</div>
+          <div class="page-sub">Real-time status of encrypted delivery, integrity validation, and decryption events</div>
+        </div>
+        <button class="btn-primary" onclick="loadDistribution()">Refresh Status</button>
+      </div>
+
+      <div id="distribution-cards">
+        <div style="text-align:center;padding:30px;color:var(--text2);">Loading distribution data...</div>
+      </div>
+    </div>
+
+    <!-- ── 4. EXAM CENTRES (INSTITUTES) ── -->
+    <div class="section" id="sec-institutes">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Examination Centres Directory</div>
+          <div class="page-sub">Manage authorized exam centres and credentials</div>
+        </div>
+        <button class="btn-primary" onclick="openInstModal()">+ Add Examination Centre</button>
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Centre ID</th>
+                <th>Centre Name</th>
+                <th>Contact Email</th>
+                <th>District</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="institutes-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text2);">Loading centres...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 5. AUTHORIZED AUTHORITIES ── -->
+    <div class="section" id="sec-authorities">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Authorized Authorities &amp; Mobile Invigilators</div>
+          <div class="page-sub">Manage officers empowered to approve exam paper decryptions via mobile QR</div>
+        </div>
+        <button class="btn-primary" onclick="openModal('register-auth')">+ Register Authority</button>
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Authority ID</th>
+                <th>Officer Name</th>
+                <th>Role</th>
+                <th>Assigned Centre</th>
+                <th>Registered Mobile Device</th>
+                <th>Biometric Status</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="authorities-tbody">
+              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text2);">Loading authorities...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 6. REGISTERED DEVICES ── -->
+    <div class="section" id="sec-devices">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Registered Workstations &amp; Devices</div>
+          <div class="page-sub">Hardware security whitelist for workstations and mobile authentication units</div>
+        </div>
+        <button class="btn-primary" onclick="openModal('register-device')">+ Register Workstation</button>
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Device ID</th>
+                <th>Device Name</th>
+                <th>Device Type</th>
+                <th>Assigned Owner / Centre</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="devices-tbody">
+              <tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text2);">Loading devices...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 7. EMERGENCY CONTROLS ── -->
+    <div class="section" id="sec-emergency">
+      <div class="page-head">
+        <div>
+          <div class="page-title" style="color:var(--red);">Emergency Lock &amp; Kill-Switch Controls</div>
+          <div class="page-sub">Instant freeze mechanism to prevent unauthorized decryption across all centres</div>
+        </div>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--red);">
+        <div class="card-head" style="background:var(--red-lt);">
+          <div style="font-weight:700;color:var(--red);">CRITICAL CONTROLLER INTERVENTION</div>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--navy);line-height:1.6;margin-bottom:18px;">
+            Engaging an emergency lock instantly revokes decryption capabilities for that paper across <strong>all examination centres</strong>. Even if the unlock time is reached and mobile authorization is present, the key envelope cannot be released until the controller lifts the lock.
+          </p>
+
+          <div id="emergency-list" style="display:flex;flex-direction:column;gap:12px;">
+            <div style="text-align:center;padding:20px;color:var(--text2);">Loading exam lock matrix...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 8. AUDIT LOGS ── -->
+    <div class="section" id="sec-logs">
+      <div class="page-head">
+        <div>
+          <div class="page-title">Immutable Audit Trail &amp; Reports</div>
+          <div class="page-sub">Real-time cryptographic audit log for all system, controller, centre, and sync actions</div>
+        </div>
+        <button class="btn-primary" onclick="loadAuditLogs()">Refresh Audit Trail</button>
+      </div>
+
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Event</th>
+                <th>Actor</th>
+                <th>Target</th>
+                <th>Result</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="logs-tbody">
+              <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text2);">Loading audit trail...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ════════════ MODALS ════════════ -->
+
+<!-- Upload Paper Modal -->
+<div class="modal-overlay" id="modal-upload-paper" onclick="closeModalOutside(event)">
+  <div class="modal" style="width:560px;">
+    <div class="modal-head">
+      <div>
+        <span class="modal-title">Upload &amp; Encrypt Question Paper</span>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px;">AES-256-CBC Encryption &bull; SHA-256 Checksum</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('upload-paper')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Primary Centre ID *</label>
+          <input class="form-input" id="up-inst-id" placeholder="e.g. INS-1001">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Paper Code (Digits) *</label>
+          <input class="form-input" id="up-paper-code" placeholder="e.g. 202401">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Exam Subject / Name *</label>
+        <input class="form-input" id="up-exam-name" placeholder="e.g. Mathematics XII Final Board Examination">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Assign Multiple Centres (Comma separated or blank for all)</label>
+        <input class="form-input" id="up-assigned-centres" placeholder="e.g. INS-1001, INS-1002, INS-1005">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label class="form-label">Exam Date *</label>
+          <input class="form-input" type="date" id="up-exam-date">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Unlock Date *</label>
+          <input class="form-input" type="date" id="up-unlock-date">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unlock Time (Exact Moment Key Released) *</label>
+        <input class="form-input" type="time" id="up-unlock-time">
+      </div>
+      <div class="form-group">
+        <label class="form-label">PDF Question Paper (Max 50MB) *</label>
+        <input class="form-input" type="file" id="up-pdf-file" accept="application/pdf">
+      </div>
+      <div id="up-err" style="display:none;color:var(--red);background:var(--red-lt);padding:9px;border-radius:6px;font-size:12px;margin-top:6px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('upload-paper')">Cancel</button>
+      <button class="btn-primary" id="btn-submit-upload" onclick="submitPaperUpload()">🔒 Encrypt &amp; Distribute</button>
+    </div>
+  </div>
+</div>
+
+<!-- Create Institute 2-Step Modal -->
+<div class="modal-overlay" id="modal-create-inst" onclick="closeModalOutside(event)">
+  <div class="modal" style="width:500px;">
+    <div class="modal-head">
+      <div>
+        <span class="modal-title">Create Examination Centre</span>
+        <div style="font-size:11px;color:var(--text2);margin-top:2px;" id="ci-step-lbl">Step 1 of 2: Centre Information</div>
+      </div>
+      <button class="modal-close" onclick="closeModal('create-inst')">✕</button>
+    </div>
+    <div class="modal-body" id="ci-body-1">
+      <div class="form-group"><label class="form-label">Centre / Institute Name *</label><input class="form-input" id="ci-name" placeholder="e.g. National Model Higher Secondary"></div>
+      <div class="form-group"><label class="form-label">Official Email Address *</label><input class="form-input" type="email" id="ci-email" placeholder="centre@school.edu"></div>
+      <div class="form-group"><label class="form-label">District / Region</label><input class="form-input" id="ci-district" placeholder="e.g. North Zone"></div>
+      <div id="ci-err1" style="display:none;color:var(--red);background:var(--red-lt);padding:9px;border-radius:6px;font-size:12px;"></div>
+    </div>
+    <div class="modal-body" id="ci-body-2" style="display:none;text-align:center;">
+      <div style="font-size:13px;color:var(--navy);margin-bottom:12px;">Enter the 6-digit Controller OTP sent to your admin email:</div>
+      <input class="form-input" id="ci-otp" maxlength="6" style="text-align:center;letter-spacing:6px;font-size:18px;font-weight:700;" placeholder="●●●●●●">
+      <div id="ci-err2" style="display:none;color:var(--red);background:var(--red-lt);padding:9px;border-radius:6px;font-size:12px;margin-top:8px;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('create-inst')">Cancel</button>
+      <button class="btn-primary" id="ci-btn-next" onclick="ciNextStep()">Send OTP &rarr;</button>
+      <button class="btn-primary" id="ci-btn-confirm" onclick="ciConfirm()" style="display:none;">✓ Verify &amp; Create Centre</button>
+    </div>
+  </div>
+</div>
+
+<!-- Register Authority Modal -->
+<div class="modal-overlay" id="modal-register-auth" onclick="closeModalOutside(event)">
+  <div class="modal" style="width:500px;">
+    <div class="modal-head">
+      <span class="modal-title">Register Authorized Authority</span>
+      <button class="modal-close" onclick="closeModal('register-auth')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Officer Full Name *</label><input class="form-input" id="ra-name" placeholder="e.g. Dr. Rajesh Kumar"></div>
+      <div class="form-group"><label class="form-label">Official Email *</label><input class="form-input" type="email" id="ra-email" placeholder="rajesh.kumar@gov.in"></div>
+      <div class="form-group"><label class="form-label">Role</label>
+        <select class="form-input" id="ra-role">
+          <option value="chief_invigilator">Chief Invigilator</option>
+          <option value="observer">Official Observer</option>
+          <option value="district_officer">District Examination Officer</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-label">Assigned Centre ID (Optional)</label><input class="form-input" id="ra-inst-id" placeholder="e.g. INS-1001 or leave blank for all"></div>
+      <div class="form-group"><label class="form-label">Registered Mobile Device ID</label><input class="form-input" id="ra-dev-id" placeholder="e.g. MOB-HW-8491"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('register-auth')">Cancel</button>
+      <button class="btn-primary" onclick="submitRegisterAuthority()">Register Officer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Register Workstation Device Modal -->
+<div class="modal-overlay" id="modal-register-device" onclick="closeModalOutside(event)">
+  <div class="modal" style="width:500px;">
+    <div class="modal-head">
+      <span class="modal-title">Register Trusted Workstation</span>
+      <button class="modal-close" onclick="closeModal('register-device')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Centre ID *</label><input class="form-input" id="rd-inst-id" placeholder="e.g. INS-1001"></div>
+      <div class="form-group"><label class="form-label">Device ID (Hardware Signature) *</label><input class="form-input" id="rd-dev-id" placeholder="e.g. VLT-WS-CENTRE-01"></div>
+      <div class="form-group"><label class="form-label">Workstation Label</label><input class="form-input" id="rd-name" placeholder="e.g. Principal Room Workstation A"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('register-device')">Cancel</button>
+      <button class="btn-primary" onclick="submitRegisterDevice()">Authorize Device</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span id="toastMsg"></span></div>
+
+<script>
+  // ── AUTH GUARD ──
+  const token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = '/admin-app/login.html';
+  }
+
+  function parseJwt(t) {
+    try {
+      return JSON.parse(decodeURIComponent(escape(atob(t.split('.')[1]))));
+    } catch(e) { return null; }
+  }
+
+  const decoded = parseJwt(token);
+  if (!decoded || decoded.role !== 'admin') {
+    window.location.href = '/admin-app/login.html';
+  }
+
+  const authHeaders = {
+    'Authorization': 'Bearer ' + token,
+    'Content-Type': 'application/json'
+  };
+
+  function doLogout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('adminUser');
+    window.location.href = '/admin-app/login.html';
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3200);
+  }
+
+  function openModal(id) { document.getElementById('modal-' + id).classList.add('open'); }
+  function closeModal(id) { document.getElementById('modal-' + id).classList.remove('open'); }
+  function closeModalOutside(e) { if (e.target.classList.contains('modal-overlay')) e.target.classList.remove('open'); }
+
+  function showSection(name, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    const target = document.getElementById('sec-' + name);
+    if (target) target.classList.add('active');
+
+    document.querySelectorAll('.sb-item').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    if (name === 'papers') loadPapers();
+    if (name === 'distribution') loadDistribution();
+    if (name === 'institutes') loadInstitutes();
+    if (name === 'authorities') loadAuthorities();
+    if (name === 'devices') loadDevices();
+    if (name === 'emergency') loadEmergencyMatrix();
+    if (name === 'logs') loadAuditLogs();
+  }
+
+  // ── DATA FETCHERS ──
+  async function loadOverview() {
+    try {
+      const res = await fetch('/admin/stats', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data } = await res.json();
+      document.getElementById('st-total-inst').textContent = data.totalInstitutes || 0;
+      document.getElementById('st-inst-delta').textContent = data.totalInstitutesDelta || 'Active';
+      document.getElementById('st-total-papers').textContent = data.totalPapers || 0;
+      document.getElementById('st-active-centres').textContent = data.activeToday || 0;
+      document.getElementById('st-total-prints').textContent = data.downloads || 0;
+    } catch(e) { console.error(e); }
+
+    try {
+      const res2 = await fetch('/admin/logs?limit=5', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data: logs } = await res2.json();
+      const container = document.getElementById('overview-feed');
+      container.innerHTML = '';
+      if (!logs || !logs.length) {
+        container.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text2);font-size:12px;">No events recorded yet.</div>';
+        return;
+      }
+      logs.forEach(l => {
+        container.innerHTML += `
+          <div class="activity-item">
+            <div class="act-dot ${l.badgeClass}"></div>
+            <div style="flex:1;">
+              <div class="act-msg">${l.details || l.event}</div>
+              <div class="act-meta">${l.timeFormatted} &bull; ${l.actorId}</div>
+            </div>
+            <span class="act-badge ${l.badgeClass}">${l.result}</span>
+          </div>
+        `;
+      });
+    } catch(e) {}
+  }
+
+  async function loadPapers() {
+    try {
+      const res = await fetch('/admin/papers', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data: papers } = await res.json();
+      const tbody = document.getElementById('papers-tbody');
+      tbody.innerHTML = '';
+      if (!papers || !papers.length) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text2);">No exam papers uploaded yet.</td></tr>';
+        return;
+      }
+      papers.forEach(p => {
+        const unlockStr = new Date(p.unlockTime).toLocaleString('en-IN', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+        const examDateStr = new Date(p.examDate).toLocaleDateString('en-IN', { month:'short', day:'numeric', year:'numeric' });
+        const checksumShort = p.sha256Checksum ? p.sha256Checksum.substring(0, 10) + '...' : 'Available';
+        const centresCount = p.assignedInstitutes ? p.assignedInstitutes.length : 1;
+
+        tbody.innerHTML += `
+          <tr>
+            <td style="font-weight:600;">${p.examId}</td>
+            <td>${p.paperCode}</td>
+            <td><strong>${p.examName}</strong></td>
+            <td>${centresCount} Centre(s)</td>
+            <td>${examDateStr}</td>
+            <td style="color:var(--indigo);font-weight:600;">${unlockStr}</td>
+            <td><code style="font-size:11px;background:var(--bg);padding:2px 6px;border-radius:4px;">${checksumShort}</code></td>
+            <td><span class="chip ${p.status}"><span class="chip-dot"></span>${p.status.toUpperCase()}</span></td>
+            <td>
+              ${p.isEmergencyLocked 
+                ? `<button class="tbl-btn primary" onclick="emergencyUnlock('${p.examId}')">Lift Lock</button>` 
+                : `<button class="tbl-btn danger" onclick="emergencyLock('${p.examId}')">Freeze</button>`}
+            </td>
+          </tr>
+        `;
+      });
+    } catch(e) { console.error(e); }
+  }
+
+  async function loadDistribution() {
+    try {
+      const res = await fetch('/admin/distribution-status', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data } = await res.json();
+      const container = document.getElementById('distribution-cards');
+      container.innerHTML = '';
+      if (!data || !data.length) {
+        container.innerHTML = '<div class="card" style="padding:30px;text-align:center;color:var(--text2);">No papers currently in distribution.</div>';
+        return;
+      }
+
+      data.forEach(item => {
+        let centresHtml = '';
+        item.centres.forEach(c => {
+          centresHtml += `
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;border:1px solid var(--border);">
+              <div>
+                <div style="font-weight:600;font-size:13px;">${c.instituteName} (${c.instituteId})</div>
+                <div style="font-size:11px;color:var(--text2);margin-top:2px;">Storage: AES-256 Stored &bull; Integrity: Verified Tamper-Free</div>
+              </div>
+              <div>
+                <span class="chip ${c.decryptedStatus === 'DECRYPTED' ? 'accessed' : (item.isEmergencyLocked ? 'revoked' : 'locked')}">
+                  <span class="chip-dot"></span>${c.decryptedStatus}
+                </span>
+              </div>
+            </div>
+          `;
+        });
+
+        container.innerHTML += `
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <span class="card-title">${item.examName} (${item.paperCode})</span>
+                <div style="font-size:11px;color:var(--text2);margin-top:2px;">Unlock: ${new Date(item.unlockTime).toLocaleString('en-IN')} &bull; Assigned: ${item.totalAssignedCentres} Centres</div>
+              </div>
+              <span class="chip ${item.isEmergencyLocked ? 'revoked' : 'unlocked'}"><span class="chip-dot"></span>${item.isEmergencyLocked ? 'EMERGENCY LOCKED' : 'DISTRIBUTED & SEALED'}</span>
+            </div>
+            <div class="card-body" style="display:flex;flex-direction:column;gap:8px;">
+              ${centresHtml}
+            </div>
+          </div>
+        `;
+      });
+    } catch(e) {}
+  }
+
+  async function loadInstitutes() {
+    try {
+      const res = await fetch('/institutes', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data: insts } = await res.json();
+      const tbody = document.getElementById('institutes-tbody');
+      tbody.innerHTML = '';
+      if (!insts || !insts.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text2);">No centres registered.</td></tr>';
+        return;
+      }
+      insts.forEach(i => {
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${i.instId}</strong></td>
+            <td>${i.name}</td>
+            <td>${i.email}</td>
+            <td>${i.district || 'General'}</td>
+            <td><span class="chip ${i.status}"><span class="chip-dot"></span>${i.status.toUpperCase()}</span></td>
+            <td>
+              <button class="tbl-btn ${i.status === 'active' ? 'danger' : 'primary'}" onclick="toggleInstStatus('${i.instId}')">
+                ${i.status === 'active' ? 'Suspend' : 'Activate'}
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    } catch(e) {}
+  }
+
+  async function toggleInstStatus(id) {
+    try {
+      const res = await fetch('/admin/toggle-institute-status/' + id, { method: 'POST', headers: authHeaders });
+      const data = await res.json();
+      showToast(data.message || 'Status updated');
+      loadInstitutes();
+    } catch(e) { showToast('Action failed'); }
+  }
+
+  async function loadAuthorities() {
+    try {
+      const res = await fetch('/admin/authorities', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data } = await res.json();
+      const tbody = document.getElementById('authorities-tbody');
+      tbody.innerHTML = '';
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text2);">No authorized invigilators registered yet.</td></tr>';
+        return;
+      }
+      data.forEach(a => {
+        tbody.innerHTML += `
+          <tr>
+            <td><strong>${a.authorityId}</strong></td>
+            <td>${a.name}</td>
+            <td>${a.role.replace(/_/g, ' ').toUpperCase()}</td>
+            <td>${a.assignedInstituteId || 'All Centres'}</td>
+            <td><code>${a.registeredDeviceId || 'MOB-DEFAULT'}</code></td>
+            <td><span class="chip active"><span class="chip-dot"></span>REGISTERED</span></td>
+            <td><span class="chip ${a.status}"><span class="chip-dot"></span>${a.status.toUpperCase()}</span></td>
+          </tr>
+        `;
+      });
+    } catch(e) {}
+  }
+
+  async function loadDevices() {
+    try {
+      const res = await fetch('/admin/devices', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data } = await res.json();
+      const tbody = document.getElementById('devices-tbody');
+      tbody.innerHTML = '';
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--text2);">No devices registered yet.</td></tr>';
+        return;
+      }
+      data.forEach(d => {
+        tbody.innerHTML += `
+          <tr>
+            <td><code>${d.deviceId}</code></td>
+            <td><strong>${d.deviceName}</strong></td>
+            <td>${d.deviceType}</td>
+            <td>${d.ownerName}</td>
+            <td><span class="chip active"><span class="chip-dot"></span>${d.status.toUpperCase()}</span></td>
+          </tr>
+        `;
+      });
+    } catch(e) {}
+  }
+
+  async function loadEmergencyMatrix() {
+    try {
+      const res = await fetch('/admin/papers', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data: papers } = await res.json();
+      const container = document.getElementById('emergency-list');
+      container.innerHTML = '';
+      if (!papers || !papers.length) {
+        container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text2);">No exams currently scheduled.</div>';
+        return;
+      }
+      papers.forEach(p => {
+        container.innerHTML += `
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--bg);border-radius:9px;border:1px solid var(--border);">
+            <div>
+              <div style="font-weight:700;font-size:14px;color:var(--navy);">${p.examName} (${p.paperCode})</div>
+              <div style="font-size:12px;color:var(--text2);margin-top:2px;">Exam ID: ${p.examId} &bull; Unlock Time: ${new Date(p.unlockTime).toLocaleString('en-IN')}</div>
+            </div>
+            <div>
+              ${p.isEmergencyLocked
+                ? `<button class="btn-primary" onclick="emergencyUnlock('${p.examId}')">Lift Emergency Lock</button>`
+                : `<button class="btn-danger" onclick="emergencyLock('${p.examId}')">🚨 ENGAGE EMERGENCY LOCK</button>`
+              }
+            </div>
+          </div>
+        `;
+      });
+    } catch(e) {}
+  }
+
+  async function emergencyLock(examId) {
+    const reason = prompt('Please enter the reason for emergency freeze (e.g. Paper Leak Alert / Centre Incident):', 'Controller Emergency Freeze');
+    if (!reason) return;
+    try {
+      const res = await fetch('/admin/emergency-lock/' + examId, {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ reason })
+      });
+      const data = await res.json();
+      showToast(data.message || 'Emergency lock engaged.');
+      loadEmergencyMatrix();
+      loadPapers();
+    } catch(e) { showToast('Failed to engage lock'); }
+  }
+
+  async function emergencyUnlock(examId) {
+    if (!confirm('Are you sure you want to lift the emergency lock for this exam?')) return;
+    try {
+      const res = await fetch('/admin/emergency-unlock/' + examId, { method: 'POST', headers: authHeaders });
+      const data = await res.json();
+      showToast(data.message || 'Lock lifted.');
+      loadEmergencyMatrix();
+      loadPapers();
+    } catch(e) { showToast('Failed to lift lock'); }
+  }
+
+  async function loadAuditLogs() {
+    try {
+      const res = await fetch('/admin/logs?limit=100', { headers: { 'Authorization': 'Bearer ' + token } });
+      const { data: logs } = await res.json();
+      const tbody = document.getElementById('logs-tbody');
+      tbody.innerHTML = '';
+      if (!logs || !logs.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text2);">No audit trail records found.</td></tr>';
+        return;
+      }
+      logs.forEach(l => {
+        tbody.innerHTML += `
+          <tr>
+            <td style="white-space:nowrap;font-size:12px;">${l.timeFormatted}</td>
+            <td><strong>${l.event}</strong></td>
+            <td>${l.actorType.toUpperCase()} &bull; ${l.actorId}</td>
+            <td>${l.targetType ? l.targetType.toUpperCase() + ': ' + (l.targetId || 'All') : 'System'}</td>
+            <td><span class="chip ${l.badgeClass}"><span class="chip-dot"></span>${l.result}</span></td>
+            <td style="font-size:12px;color:var(--text2);">${l.details}</td>
+          </tr>
+        `;
+      });
+    } catch(e) {}
+  }
+
+  // ── PAPER UPLOAD ──
+  async function submitPaperUpload() {
+    const instituteId = document.getElementById('up-inst-id').value.trim();
+    const paperCode = document.getElementById('up-paper-code').value.trim();
+    const examName = document.getElementById('up-exam-name').value.trim();
+    const assignedCentres = document.getElementById('up-assigned-centres').value.trim();
+    const examDate = document.getElementById('up-exam-date').value;
+    const unlockDate = document.getElementById('up-unlock-date').value;
+    const unlockTime = document.getElementById('up-unlock-time').value;
+    const file = document.getElementById('up-pdf-file').files[0];
+    const errEl = document.getElementById('up-err');
+
+    errEl.style.display = 'none';
+    if (!instituteId || !paperCode || !examName || !examDate || !unlockDate || !unlockTime || !file) {
+      errEl.textContent = 'Please fill all required fields and select a PDF file.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('btn-submit-upload');
+    btn.disabled = true; btn.textContent = 'Encrypting (AES-256)...';
+
+    const fd = new FormData();
+    fd.append('instituteId', instituteId);
+    fd.append('paperCode', paperCode);
+    fd.append('examName', examName);
+    fd.append('assignedInstitutes', assignedCentres);
+    fd.append('examDate', examDate);
+    fd.append('unlockDate', unlockDate);
+    fd.append('unlockTime', unlockTime);
+    fd.append('paper', file);
+
+    try {
+      const res = await fetch('/admin/upload-paper', {
+        method: 'POST',
+        headers: { 'Authorization': 'Bearer ' + token },
+        body: fd,
+      });
+      const data = await res.json();
+      btn.disabled = false; btn.textContent = '🔒 Encrypt & Distribute';
+
+      if (res.ok && data.success) {
+        showToast('Paper AES-256 encrypted and distributed to centres!');
+        closeModal('upload-paper');
+        loadPapers();
+        loadOverview();
+      } else {
+        errEl.textContent = data.message || 'Upload failed.';
+        errEl.style.display = 'block';
+      }
+    } catch(e) {
+      btn.disabled = false; btn.textContent = '🔒 Encrypt & Distribute';
+      errEl.textContent = 'Network or server error.';
+      errEl.style.display = 'block';
+    }
+  }
+
+  // ── CREATE INSTITUTE 2-STEP OTP FLOW ──
+  function openInstModal() {
+    document.getElementById('ci-name').value = '';
+    document.getElementById('ci-email').value = '';
+    document.getElementById('ci-district').value = '';
+    document.getElementById('ci-otp').value = '';
+    document.getElementById('ci-body-1').style.display = 'block';
+    document.getElementById('ci-body-2').style.display = 'none';
+    document.getElementById('ci-btn-next').style.display = 'inline-flex';
+    document.getElementById('ci-btn-confirm').style.display = 'none';
+    document.getElementById('ci-step-lbl').textContent = 'Step 1 of 2: Centre Information';
+    document.getElementById('ci-err1').style.display = 'none';
+    document.getElementById('ci-err2').style.display = 'none';
+    openModal('create-inst');
+  }
+
+  async function ciNextStep() {
+    const email = document.getElementById('ci-email').value.trim();
+    const name = document.getElementById('ci-name').value.trim();
+    const errEl = document.getElementById('ci-err1');
+    errEl.style.display = 'none';
+
+    if (!email || !email.includes('@')) {
+      errEl.textContent = 'Valid centre email is required.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('ci-btn-next');
+    btn.disabled = true; btn.textContent = 'Sending OTP...';
+
+    try {
+      const res = await fetch('/admin/institute/request-otp', {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ email, name })
+      });
+      const data = await res.json();
+      btn.disabled = false; btn.textContent = 'Send OTP →';
+
+      if (res.ok && data.success) {
+        showToast('🔑 Authorization OTP sent to your admin email');
+        document.getElementById('ci-body-1').style.display = 'none';
+        document.getElementById('ci-body-2').style.display = 'block';
+        document.getElementById('ci-btn-next').style.display = 'none';
+        document.getElementById('ci-btn-confirm').style.display = 'inline-flex';
+        document.getElementById('ci-step-lbl').textContent = 'Step 2 of 2: 2FA Authorization';
+      } else {
+        errEl.textContent = data.message || 'Failed to request OTP.';
+        errEl.style.display = 'block';
+      }
+    } catch(e) {
+      btn.disabled = false; btn.textContent = 'Send OTP →';
+      errEl.textContent = 'Server error.';
+      errEl.style.display = 'block';
+    }
+  }
+
+  async function ciConfirm() {
+    const email = document.getElementById('ci-email').value.trim();
+    const name = document.getElementById('ci-name').value.trim();
+    const district = document.getElementById('ci-district').value.trim();
+    const otp = document.getElementById('ci-otp').value.trim();
+    const errEl = document.getElementById('ci-err2');
+    errEl.style.display = 'none';
+
+    if (otp.length < 6) {
+      errEl.textContent = 'Please enter the 6-digit OTP.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('ci-btn-confirm');
+    btn.disabled = true; btn.textContent = 'Verifying & Provisioning...';
+
+    try {
+      const res = await fetch('/admin/institute', {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ email, name, district, otp })
+      });
+      const data = await res.json();
+      btn.disabled = false; btn.textContent = '✓ Verify & Create Centre';
+
+      if (res.ok && data.success) {
+        showToast('Centre ' + data.data.instituteId + ' created and credentials emailed!');
+        closeModal('create-inst');
+        loadInstitutes();
+        loadOverview();
+      } else {
+        errEl.textContent = data.message || 'Creation failed.';
+        errEl.style.display = 'block';
+      }
+    } catch(e) {
+      btn.disabled = false; btn.textContent = '✓ Verify & Create Centre';
+      errEl.textContent = 'Server error.';
+      errEl.style.display = 'block';
+    }
+  }
+
+  // ── REGISTER AUTHORITY ──
+  async function submitRegisterAuthority() {
+    const name = document.getElementById('ra-name').value.trim();
+    const email = document.getElementById('ra-email').value.trim();
+    const role = document.getElementById('ra-role').value;
+    const assignedInstituteId = document.getElementById('ra-inst-id').value.trim();
+    const registeredDeviceId = document.getElementById('ra-dev-id').value.trim();
+
+    if (!name || !email) {
+      alert('Officer name and email are required.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/authority/register', {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ name, email, role, assignedInstituteId, registeredDeviceId })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Authority ' + data.data.authorityId + ' registered successfully.');
+        closeModal('register-auth');
+        loadAuthorities();
+      } else {
+        alert(data.message || 'Registration failed');
+      }
+    } catch(e) { alert('Server error'); }
+  }
+
+  // ── REGISTER WORKSTATION DEVICE ──
+  async function submitRegisterDevice() {
+    const instituteId = document.getElementById('rd-inst-id').value.trim();
+    const deviceId = document.getElementById('rd-dev-id').value.trim();
+    const deviceName = document.getElementById('rd-name').value.trim();
+
+    if (!instituteId || !deviceId) {
+      alert('Institute ID and Device ID are required.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/admin/register-device', {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify({ instituteId, deviceId, deviceName })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        showToast('Device authorized and whitelisted.');
+        closeModal('register-device');
+        loadDevices();
+      } else {
+        alert(data.message || 'Registration failed');
+      }
+    } catch(e) { alert('Server error'); }
+  }
+
+  // ── INITIAL LOAD ──
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('live-date').textContent = new Date().toLocaleDateString('en-IN', { weekday:'short', year:'numeric', month:'short', day:'numeric' });
+    loadOverview();
+  });
+</script>
+</body>
+</html>
